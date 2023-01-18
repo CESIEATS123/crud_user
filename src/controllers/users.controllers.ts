@@ -49,7 +49,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
     
 };
 
-export const getMany = async (
+export const all = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -66,7 +66,7 @@ export const getMany = async (
     }
 };
 
-export const getOne = async (
+export const findOne = async (
     req: Request,
     res: Response,
     next: NextFunction

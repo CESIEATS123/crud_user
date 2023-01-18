@@ -15,17 +15,21 @@ class UserModel {
         try {
             // open connection with db
             const connection = await db.connect();
-            const sql = `INSERT INTO users (email, user_name, first_name, last_name, password, role, jeton)
-            values ($1, $2, $3, $4, $5, $6, $7) returning id, email, user_name, first_name, last_name, role`;
+            const sql = `INSERT INTO users (email, user_name, first_name, last_name, numStreet, street, cp, city, phone, password, role)
+            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id, email, user_name, first_name, last_name, role, numStreet, street, cp, city, phone`;
             // run query
             const result = await connection.query(sql, [
                 u.email,
                 u.user_name,
                 u.first_name,
                 u.last_name,
+                u.numStreet,
+                u.street,
+                u.cp,
+                u.city,
+                u.phone,
                 hashPassword(u.password),
                 u.role,
-                u.jeton,
             ]);
             // release connection
             connection.release();
@@ -42,19 +46,19 @@ class UserModel {
     async generateAuthTokenAndSaveUSer(u:User): Promise<string> {
         try {
             const authToken = jwt.sign({ u }, config.tokenSecret as unknown as string);
-            const connection = await db.connect();
-            const sql = `UPDATE users
-                        SET jeton=$1
-                        WHERE id=$2
-                        RETURNING id, email, user_name, first_name, last_name, jeton, role`; 
-        // run query
-            const result = await connection.query(sql, [
-                authToken,
-                u.id,
-            ]);
-            // release connection
-            connection.release();
-            // return created user
+        //     const connection = await db.connect();
+        //     const sql = `UPDATE users
+        //                 SET jeton=$1
+        //                 WHERE id=$2
+        //                 RETURNING id, email, user_name, first_name, last_name, jeton, role`; 
+        // // run query
+        //     const result = await connection.query(sql, [
+        //         authToken,
+        //         u.id,
+        //     ]);
+        //     // release connection
+        //     connection.release();
+        //     // return created user
             return authToken;
     } catch(error) {
         throw new Error(
@@ -67,7 +71,7 @@ class UserModel {
         try {
             // open connection with db
             const connection = await db.connect();
-            const sql = `SELECT id, email, user_name, first_name, last_name, role from users`;
+            const sql = `SELECT id, email, user_name, first_name, last_name, role, numStreet, street, cp, city, phone from users`;
             // run query
             const result = await connection.query(sql);
             // release connection
@@ -85,7 +89,7 @@ class UserModel {
         try {
             // open connection with db
             const connection = await db.connect();
-            const sql = `SELECT id, email, user_name, first_name, last_name, role from users
+            const sql = `SELECT id, email, user_name, first_name, last_name, role, numStreet, street, cp, city, phone from users
             WHERE id=($1)`;
             // run query
             const result = await connection.query(sql, [id]);
@@ -106,9 +110,9 @@ class UserModel {
             const connection = await db.connect();
             const sql = `UPDATE users
                         SET email=$1, user_name=$2, first_name=$3,
-                        last_name=$4, password=$5, role=$6, jeton=$7
-                        WHERE id=$8
-                        RETURNING id, email, user_name, first_name, last_name, role`;
+                        last_name=$4, password=$5, role=$6, numStreet=$7, street=$8, cp=$9, city=$10, phone=$11
+                        WHERE id=$12
+                        RETURNING id, email, user_name, first_name, last_name, role, numStreet, street, cp, city, phone`;
             // run query
             const result = await connection.query(sql, [
                 u.email,
@@ -117,7 +121,11 @@ class UserModel {
                 u.last_name, 
                 hashPassword(u.password),
                 u.role,
-                u.jeton,
+                u.numStreet,
+                u.street,
+                u.cp,
+                u.city,
+                u.phone,
                 u.id,
             ]);
             // release connection
@@ -137,7 +145,7 @@ class UserModel {
             const connection = await db.connect();
             const sql = `DELETE FROM users
                         WHERE id=($1)
-                        RETURNING id, email, user_name, first_name, last_name, role`;
+                        RETURNING id, email, user_name, first_name, last_name, role, numStreet, street, cp, city, phone`;
             
             const result = await connection.query(sql, [id]);
             // release connection
@@ -165,7 +173,7 @@ class UserModel {
                 );
                 if (isPasswordValid) {
                     const userInfo = await connection.query(
-                        'SELECT id, email, user_name, first_name, last_name from users WHERE email=($1)',
+                        'SELECT id, email, user_name, first_name, last_name, numStreet, street, cp, city, phone from users WHERE email=($1)',
                         [email]
                     );
                     return userInfo.rows[0];

@@ -4,12 +4,13 @@ import authenticationMiddleware from '../../middleware/authentification.middlewa
 
 const routes = Router();
 // api/roles
-routes.route('/').get(authenticationMiddleware, controllers.getMany).post(controllers.create);
+routes.route('/all').get(controllers.all);
+routes.route('/create').post(controllers.create);
 
 routes
     .route('/:id')
-        .get(authenticationMiddleware, controllers.getOne)
-        .patch(authenticationMiddleware, controllers.updateOne)
+        .get(controllers.findOne)
+        .patch(controllers.updateOne)
         .delete(authenticationMiddleware, controllers.deleteOne);
 
 

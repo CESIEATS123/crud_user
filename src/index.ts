@@ -81,9 +81,10 @@ db.connect().then((client) => {
 //     });
 // });
 
-//
+// Gestion des erreurs
 app.use(errorMiddleware);
-// Gestions des erreurs
+
+// Gestion des pages introuvables
 app.use((req: Request, res: Response) => {
     res.status(404).json({
         message: 'Vérifier votre url',
